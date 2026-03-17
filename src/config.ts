@@ -1,5 +1,11 @@
 // ─── App ────────────────────────────────────────────────────────────────────
 export const APP_NAME = 'ProdeFC'
+
+// ─── API-Football CDN ────────────────────────────────────────────────────────
+// Los logos se sirven desde el CDN público de API-Football — sin API key.
+export const API_FOOTBALL_CDN = 'https://media.api-sports.io/football'
+export const UCL_LOGO_URL    = `${API_FOOTBALL_CDN}/leagues/2.png`   // Champions League
+export const WC2026_LOGO_URL = `${API_FOOTBALL_CDN}/leagues/1.png`   // FIFA World Cup
 export const APP_MAX_WIDTH = 430 // px — matches iPhone 13/14 width
 
 // ─── Competition ────────────────────────────────────────────────────────────

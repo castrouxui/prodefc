@@ -1,10 +1,12 @@
 import { useMatches } from '@/hooks/useMatches'
 import { usePredictions } from '@/hooks/usePredictions'
+import { useActiveCompetition } from '@/hooks/useCompetitions'
 import MatchCard from '@/components/match/MatchCard'
 
 export default function Fixture() {
   const { data: matches = [],     isLoading: matchesLoading } = useMatches()
   const { data: predictions = [], isLoading: predictionsLoading } = usePredictions()
+  const activeComp = useActiveCompetition()
 
   const predictionsByMatchId = Object.fromEntries(predictions.map(p => [p.match_id, p]))
 
@@ -18,9 +20,18 @@ export default function Fixture() {
 
   return (
     <div style={{ paddingTop: 12 }}>
-      <div style={{ padding: '0 var(--page-px) 12px' }}>
+      <div style={{ padding: '0 var(--page-px) 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        {activeComp.logo_url && (
+          <img
+            src={activeComp.logo_url}
+            alt={activeComp.name}
+            width={28}
+            height={28}
+            style={{ objectFit: 'contain' }}
+          />
+        )}
         <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.5, color: 'var(--text-primary)' }}>
-          Fixture UCL
+          {activeComp.name}
         </h1>
       </div>
 

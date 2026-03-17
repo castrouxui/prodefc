@@ -4,37 +4,39 @@ import { useMatches } from '@/hooks/useMatches'
 import { usePredictions } from '@/hooks/usePredictions'
 import { useRanking } from '@/hooks/useRanking'
 import { useGroupStore } from '@/store/groupStore'
+import { useActiveCompetition, useComingSoonCompetitions } from '@/hooks/useCompetitions'
 import MatchCard from '@/components/match/MatchCard'
 import RankingTable from '@/components/ranking/RankingTable'
 import {
-  COMPETITION_LABEL,
   COMPETITION_STATUS_LABEL,
   HOME_MATCHES_LIMIT,
   HOME_RANKING_LIMIT,
 } from '@/config'
 
 export default function Home() {
-  const activeGroupId = useGroupStore(s => s.activeGroupId)
+  const activeGroupId  = useGroupStore(s => s.activeGroupId)
+  const activeComp     = useActiveCompetition()
+  const comingSoon     = useComingSoonCompetitions()
 
   const { data: matches     = [], isLoading: matchesLoading     } = useMatches({ limit: HOME_MATCHES_LIMIT })
   const { data: predictions = [], isLoading: predictionsLoading } = usePredictions()
   const { data: ranking     = [], isLoading: rankingLoading      } = useRanking()
 
-  // Build a lookup map so MatchCard can find the user's prediction in O(1).
-  // Memoized so it only recomputes when the predictions array reference changes.
   const predictionsByMatchId = useMemo(
     () => Object.fromEntries(predictions.map(p => [p.match_id, p])),
     [predictions],
   )
 
-  // User hasn't joined any group yet — show onboarding prompt
   if (!activeGroupId) return <NoGroupPrompt />
 
   return (
     <div style={{ paddingTop: 8 }}>
       {/* Competition indicator */}
       <div style={{ padding: '0 var(--page-px) 12px' }}>
-        <CompetitionPill label={`${COMPETITION_LABEL} · ${COMPETITION_STATUS_LABEL}`} />
+        <CompetitionPill
+          label={`${activeComp.name} · ${COMPETITION_STATUS_LABEL}`}
+          logoUrl={activeComp.logo_url}
+        />
       </div>
 
       {/* Upcoming matches */}
@@ -57,7 +59,7 @@ export default function Home() {
       </section>
 
       {/* Group ranking preview */}
-      <section style={{ padding: '0 var(--page-px)' }}>
+      <section style={{ padding: '0 var(--page-px)', marginBottom: 16 }}>
         <div className="section-header" style={{ padding: 0, marginBottom: 8 }}>
           <span className="section-title">Ranking</span>
           <Link to="/ranking" className="section-link">Ver completo</Link>
@@ -68,6 +70,18 @@ export default function Home() {
           : <RankingTable entries={ranking} limit={HOME_RANKING_LIMIT} />
         }
       </section>
+
+      {/* Coming soon competitions */}
+      {comingSoon.length > 0 && (
+        <section style={{ padding: '0 var(--page-px) 24px' }}>
+          <div className="section-header" style={{ padding: 0, marginBottom: 8 }}>
+            <span className="section-title">Próximamente</span>
+          </div>
+          {comingSoon.map(comp => (
+            <ComingSoonCard key={comp.key} competition={comp} />
+          ))}
+        </section>
+      )}
     </div>
   )
 }
@@ -75,16 +89,62 @@ export default function Home() {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 /** Small pill that shows which competition is active. */
-function CompetitionPill({ label }) {
+function CompetitionPill({ label, logoUrl }) {
   return (
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: 7,
       background: 'var(--bg-card)', border: '0.5px solid var(--border)',
       borderRadius: 'var(--radius-full)', padding: '5px 12px',
     }}>
-      {/* Live indicator dot */}
-      <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)' }} />
+      {logoUrl
+        ? <img src={logoUrl} alt="" width={16} height={16} style={{ objectFit: 'contain' }} />
+        : <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)' }} />
+      }
       <span className="comp-label">{label}</span>
+    </div>
+  )
+}
+
+/** Card for a competition that hasn't started yet. */
+function ComingSoonCard({ competition }) {
+  return (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '0.5px solid var(--border)',
+      borderRadius: 'var(--radius-md)',
+      padding: '14px 16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+    }}>
+      {competition.logo_url && (
+        <img
+          src={competition.logo_url}
+          alt={competition.name}
+          width={40}
+          height={40}
+          style={{ objectFit: 'contain', flexShrink: 0 }}
+        />
+      )}
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+          {competition.name}
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          {competition.season}
+        </div>
+      </div>
+      <div style={{
+        fontSize: 11, fontWeight: 600, color: 'var(--accent)',
+        background: 'var(--accent-dim)',
+        borderRadius: 'var(--radius-full)',
+        padding: '4px 10px',
+        letterSpacing: '0.3px',
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+      }}>
+        Próximamente
+      </div>
     </div>
   )
 }
