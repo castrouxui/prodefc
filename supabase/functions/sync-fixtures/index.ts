@@ -17,12 +17,12 @@ const corsHeaders = {
 
 // Mapeo de stage de football-data.org a nuestro formato de ronda
 const STAGE_LABEL: Record<string, string> = {
-  'LEAGUE_PHASE':          'Fase de Liga',
-  'KNOCKOUT_PHASE_PLAY_OFFS': 'Playoff',
-  'ROUND_OF_16':           'Octavos',
-  'QUARTER_FINALS':        'Cuartos',
-  'SEMI_FINALS':           'Semifinal',
-  'FINAL':                 'Final',
+  'LEAGUE_STAGE': 'Fase de Liga',
+  'PLAYOFFS':     'Playoff',
+  'LAST_16':      'Octavos',
+  'QUARTER_FINALS': 'Cuartos',
+  'SEMI_FINALS':  'Semifinal',
+  'FINAL':        'Final',
 }
 
 function mapStatus(status: string): string {
@@ -32,7 +32,10 @@ function mapStatus(status: string): string {
 }
 
 function roundLabel(stage: string, matchday: number | null): string {
-  return STAGE_LABEL[stage] ?? stage
+  const base = STAGE_LABEL[stage] ?? stage
+  // En la fase de liga, incluir la jornada
+  if (stage === 'LEAGUE_STAGE' && matchday) return `Fase de Liga · J${matchday}`
+  return base
 }
 
 serve(async (req) => {
@@ -69,20 +72,22 @@ serve(async (req) => {
     const apiData = await apiRes.json()
     const fixtures = apiData.matches ?? []
 
-    // Transformar al schema de matches
-    const matches = fixtures.map((f: any) => ({
-      home_team:  f.homeTeam.name,
-      away_team:  f.awayTeam.name,
-      home_logo:  f.homeTeam.crest ?? null,
-      away_logo:  f.awayTeam.crest ?? null,
-      match_date: f.utcDate,
-      round:      roundLabel(f.stage, f.matchday),
-      competition: 'UCL',
-      home_score: f.score?.fullTime?.home ?? null,
-      away_score: f.score?.fullTime?.away ?? null,
-      status:     mapStatus(f.status),
-      api_id:     `fd-${f.id}`,   // prefijo 'fd-' para distinguir de API-Football IDs
-    }))
+    // Filtrar partidos sin equipos definidos aún (TBD) y transformar
+    const matches = fixtures
+      .filter((f: any) => f.homeTeam?.name && f.awayTeam?.name)
+      .map((f: any) => ({
+        home_team:   f.homeTeam.name,
+        away_team:   f.awayTeam.name,
+        home_logo:   f.homeTeam.crest ?? null,
+        away_logo:   f.awayTeam.crest ?? null,
+        match_date:  f.utcDate,
+        round:       roundLabel(f.stage, f.matchday),
+        competition: 'UCL',
+        home_score:  f.score?.fullTime?.home ?? null,
+        away_score:  f.score?.fullTime?.away ?? null,
+        status:      mapStatus(f.status),
+        api_id:      `fd-${f.id}`,
+      }))
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
