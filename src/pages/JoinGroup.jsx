@@ -51,7 +51,8 @@ export default function JoinGroup() {
 
   // ── Success screen after creating a group ────────────────────
   if (createdGroup) {
-    const shareText = `Unite a mi prode de Champions League! Código: ${createdGroup.invite_code}`
+    const joinUrl   = `${import.meta.env.VITE_APP_URL}/join/${createdGroup.invite_code}`
+    const shareText = `Unite a mi prode de Champions League 2025/26 🏆\n${joinUrl}`
     const canShare  = typeof navigator.share === 'function'
 
     return (
@@ -87,7 +88,7 @@ export default function JoinGroup() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {canShare && (
             <button
-              onClick={() => navigator.share({ text: shareText })}
+              onClick={() => navigator.share({ title: 'ProdeFC', text: shareText, url: joinUrl })}
               style={{
                 padding: '13px 0', background: 'var(--accent)', color: '#000',
                 border: 'none', borderRadius: 'var(--radius-md)',
@@ -98,7 +99,7 @@ export default function JoinGroup() {
             </button>
           )}
           <button
-            onClick={() => handleCopy(createdGroup.invite_code)}
+            onClick={() => handleCopy(joinUrl)}
             style={{
               padding: '13px 0',
               background: copied ? 'var(--success-bg)' : 'var(--bg-card)',
@@ -108,7 +109,7 @@ export default function JoinGroup() {
               fontSize: 15, fontWeight: 700, cursor: 'pointer',
             }}
           >
-            {copied ? '¡Copiado!' : 'Copiar código'}
+            {copied ? '¡Copiado!' : 'Copiar link'}
           </button>
           <button
             onClick={() => navigate('/')}
