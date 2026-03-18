@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import AppShell from './components/layout/AppShell'
 
@@ -16,8 +16,9 @@ import MatchResults  from './pages/MatchResults'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuthStore()
+  const location = useLocation()
   if (loading) return <div className="flex h-screen items-center justify-center text-[var(--text-secondary)]">Cargando...</div>
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />
   return children
 }
 

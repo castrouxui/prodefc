@@ -1,23 +1,46 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useJoinGroup, useCreateGroup } from '@/hooks/useGroup'
 import { useGroupStore } from '@/store/groupStore'
+import { useAuthStore } from '@/store/authStore'
 
 export default function JoinGroup() {
   const { inviteCode: paramCode } = useParams()
-  const isCreate = paramCode === 'crear'
-  const navigate = useNavigate()
+  const isCreate  = paramCode === 'crear'
+  const autoCode  = !isCreate && paramCode !== 'nuevo' ? paramCode : null
+  const navigate  = useNavigate()
   const setActive = useGroupStore(s => s.setActiveGroup)
+  const user      = useAuthStore(s => s.user)
 
-  const [code,         setCode]         = useState(paramCode !== 'nuevo' && !isCreate ? paramCode : '')
+  const [code,         setCode]         = useState(autoCode ?? '')
   const [name,         setName]         = useState('')
   const [amount,       setAmount]       = useState('')
   const [error,        setError]        = useState(null)
   const [createdGroup, setCreatedGroup] = useState(null)
   const [copied,       setCopied]       = useState(false)
+  const [autoJoining,  setAutoJoining]  = useState(!!autoCode)
 
   const { mutateAsync: joinGroup,   isPending: joinPending }   = useJoinGroup()
   const { mutateAsync: createGroup, isPending: createPending } = useCreateGroup()
+
+  // Auto-join when arriving via invite link
+  useEffect(() => {
+    if (!autoCode || !user) return
+    joinGroup(autoCode)
+      .then(group => {
+        setActive(group.id)
+        navigate('/', { replace: true })
+      })
+      .catch(err => {
+        if (err.message === 'Ya sos miembro de este grupo') {
+          navigate('/', { replace: true })
+        } else {
+          setError(err.message)
+          setAutoJoining(false)
+        }
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleJoin(e) {
     e.preventDefault()
@@ -47,6 +70,21 @@ export default function JoinGroup() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
+  }
+
+  // ── Auto-joining via invite link ─────────────────────────────
+  if (autoJoining) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-app)', gap: 16 }}>
+        <div style={{ fontSize: 36 }}>🔗</div>
+        <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Uniéndote al grupo...</p>
+        {error && (
+          <p style={{ fontSize: 13, color: 'var(--error-text)', background: 'var(--error-bg)', padding: '10px 16px', borderRadius: 10 }}>
+            {error}
+          </p>
+        )}
+      </div>
+    )
   }
 
   // ── Success screen after creating a group ────────────────────

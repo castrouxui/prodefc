@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Register() {
-  const navigate = useNavigate()
-  const user     = useAuthStore(s => s.user)
+  const navigate  = useNavigate()
+  const location  = useLocation()
+  const user      = useAuthStore(s => s.user)
   const { signUp } = useAuth()
+  const from = location.state?.from ?? '/'
 
   const [name,      setName]      = useState('')
   const [email,     setEmail]     = useState('')
@@ -31,7 +33,7 @@ export default function Register() {
       if (data.session) {
         // Email confirmation desactivado — sesión inmediata
         // Pequeña espera para que onAuthStateChange actualice el store antes de navegar
-        setTimeout(() => navigate('/'), 100)
+        setTimeout(() => navigate(from, { replace: true }), 100)
       } else {
         // Requiere confirmación de email
         setEmailSent(true)

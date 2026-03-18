@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/store/authStore'
 import { useGroupStore } from '@/store/groupStore'
@@ -8,9 +8,11 @@ const DEMO_GROUP_ID = 'aaaaaaaa-0000-0000-0000-000000000001'
 
 export default function Login() {
   const navigate       = useNavigate()
+  const location       = useLocation()
   const user           = useAuthStore(s => s.user)
   const setActiveGroup = useGroupStore(s => s.setActiveGroup)
   const { signInWithEmail } = useAuth()
+  const from = location.state?.from ?? '/'
 
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -18,14 +20,14 @@ export default function Login() {
   const [loading,  setLoading]  = useState(null) // 'login' | 'demo' | null
   const [error,    setError]    = useState(null)
 
-  if (user) { navigate('/', { replace: true }); return null }
+  if (user) { navigate(from, { replace: true }); return null }
 
   async function handleLogin(e) {
     e.preventDefault()
     setError(null); setLoading('login')
     try {
       await signInWithEmail(email, password)
-      navigate('/')
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err.message)
       setLoading(null)
@@ -113,7 +115,7 @@ export default function Login() {
 
         <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-secondary)', marginTop: 16, marginBottom: 0 }}>
           ¿No tenés cuenta?{' '}
-          <Link to="/register" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}>
+          <Link to="/register" state={{ from }} style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}>
             Crear cuenta
           </Link>
         </p>
