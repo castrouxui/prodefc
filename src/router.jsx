@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import AppShell from './components/layout/AppShell'
 
+import Register      from './pages/Register'
 import Home          from './pages/Home'
 import Fixture       from './pages/Fixture'
 import Ranking       from './pages/Ranking'
@@ -22,7 +23,8 @@ function PrivateRoute({ children }) {
 export default function AppRouter() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login"    element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route path="/" element={
         <PrivateRoute>
