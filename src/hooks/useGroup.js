@@ -53,12 +53,7 @@ export function useCreateGroup() {
         .single()
       if (gErr) throw gErr
 
-      // Admin entra directo sin pagar
-      const { error: mErr } = await supabase
-        .from('group_members')
-        .insert({ group_id: group.id, user_id: user.id, payment_status: 'approved' })
-      if (mErr) throw mErr
-
+      // El trigger on_group_created agrega automáticamente al creador como miembro approved
       return group
     },
     onSuccess: (group) => {
