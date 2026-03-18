@@ -30,7 +30,8 @@ export default function Register() {
       const data = await signUp(email, password, name)
       if (data.session) {
         // Email confirmation desactivado — sesión inmediata
-        navigate('/')
+        // Pequeña espera para que onAuthStateChange actualice el store antes de navegar
+        setTimeout(() => navigate('/'), 100)
       } else {
         // Requiere confirmación de email
         setEmailSent(true)

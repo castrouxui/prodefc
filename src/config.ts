@@ -31,7 +31,12 @@ export const DEFAULT_ENTRY_AMOUNT = 0
 // ─── Invite code generation ──────────────────────────────────────────────────
 /** Generates a random 6-character uppercase alphanumeric invite code. */
 export function generateInviteCode() {
-  return Math.random().toString(36).substring(2, 2 + INVITE_CODE_LENGTH).toUpperCase()
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // sin caracteres ambiguos (0/O, 1/I)
+  let code = ''
+  while (code.length < INVITE_CODE_LENGTH) {
+    code += chars[Math.floor(Math.random() * chars.length)]
+  }
+  return code
 }
 
 // ─── Match status values ─────────────────────────────────────────────────────

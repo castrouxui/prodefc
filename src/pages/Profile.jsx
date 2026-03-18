@@ -49,7 +49,7 @@ export default function Profile() {
           Mis grupos
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {myGroups.map(({ groups: group, payment_status }) => (
+          {myGroups.map(({ groups: group, payment_status }) => !group ? null : (
             <div
               key={group.id}
               style={{

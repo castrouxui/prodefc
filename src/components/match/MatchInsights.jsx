@@ -46,6 +46,8 @@ export default function MatchInsights({ match }) {
         }}>
           {isLoading
             ? <p style={{ fontSize: 13, color: 'var(--text-secondary)', textAlign: 'center' }}>Calculando...</p>
+            : !data
+            ? <p style={{ fontSize: 13, color: 'var(--text-secondary)', textAlign: 'center' }}>Sin datos disponibles.</p>
             : <>
                 <ProbabilitySection data={data} match={match} />
                 <FormSection label={match.home_team} form={data.homeForm} logo={match.home_logo} />

@@ -16,7 +16,9 @@ export default function MyPredictions() {
       const sa = STATUS_ORDER[ma?.status] ?? 1
       const sb = STATUS_ORDER[mb?.status] ?? 1
       if (sa !== sb) return sa - sb
-      const diff = new Date(ma?.match_date) - new Date(mb?.match_date)
+      const da = new Date(ma?.match_date ?? 0)
+      const db = new Date(mb?.match_date ?? 0)
+      const diff = da - db
       return ma?.status === 'finished' ? -diff : diff
     })
   }, [predictions])
