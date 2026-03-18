@@ -25,11 +25,7 @@ export default function JoinGroup() {
     try {
       const group = await joinGroup(code)
       setActive(group.id)
-      if (group.entry_amount > 0) {
-        navigate(`/payment/${group.id}`)
-      } else {
-        navigate('/')
-      }
+      navigate('/')
     } catch (err) {
       setError(err.message)
     }

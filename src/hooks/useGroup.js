@@ -90,11 +90,11 @@ export function useJoinGroup() {
 
       if (existing?.payment_status === 'approved') throw new Error('Ya sos miembro de este grupo')
 
-      // Crear membresía pendiente si no existe
+      // Crear membresía aprobada (pago se gestiona fuera de la app por ahora)
       if (!existing) {
         const { error: mErr } = await supabase
           .from('group_members')
-          .insert({ group_id: group.id, user_id: user.id, payment_status: 'pending' })
+          .insert({ group_id: group.id, user_id: user.id, payment_status: 'approved' })
         if (mErr) throw mErr
       }
 
