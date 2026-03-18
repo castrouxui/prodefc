@@ -3,16 +3,14 @@ import { useEffect } from 'react'
 import AppRouter from './router'
 import { useAuthStore } from './store/authStore'
 import { supabase } from './lib/supabase'
+import { useTheme } from './hooks/useTheme'
 
 export default function App() {
   const setUser = useAuthStore(s => s.setUser)
   const setLoading = useAuthStore(s => s.setLoading)
 
-  // Sync dark mode preference
-  useEffect(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.classList.toggle('dark', prefersDark)
-  }, [])
+  // Inicializa el tema desde localStorage o preferencia del sistema
+  useTheme()
 
   // Sync auth state from Supabase
   useEffect(() => {

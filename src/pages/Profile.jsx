@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useMyGroups } from '@/hooks/useGroup'
 import { useGroupStore } from '@/store/groupStore'
 import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/hooks/useTheme'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 
@@ -14,6 +15,7 @@ export default function Profile() {
   const { signOut }   = useAuth()
   const { data: myGroups = [] } = useMyGroups()
 
+  const { theme, toggle: toggleTheme } = useTheme()
   const name = user?.user_metadata?.full_name ?? user?.email ?? 'Usuario'
 
   async function handleSignOut() {
@@ -72,6 +74,43 @@ export default function Profile() {
             }}
           >
             + Unirme a otro grupo
+          </button>
+        </div>
+      </div>
+
+      {/* Apariencia */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 10 }}>
+          Apariencia
+        </p>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '12px 14px',
+          background: 'var(--bg-card)', border: '0.5px solid var(--border)',
+          borderRadius: 'var(--radius-md)',
+        }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
+            {theme === 'dark' ? 'Modo oscuro' : 'Modo claro'}
+          </span>
+          <button
+            onClick={toggleTheme}
+            style={{
+              width: 48, height: 28,
+              borderRadius: 14,
+              background: theme === 'dark' ? 'var(--accent)' : 'var(--bg-inset)',
+              border: 'none', cursor: 'pointer', position: 'relative',
+              transition: 'background 0.2s',
+            }}
+          >
+            <span style={{
+              position: 'absolute', top: 3,
+              left: theme === 'dark' ? 23 : 3,
+              width: 22, height: 22, borderRadius: '50%',
+              background: theme === 'dark' ? '#000' : '#fff',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              transition: 'left 0.2s',
+              display: 'block',
+            }} />
           </button>
         </div>
       </div>
