@@ -10,7 +10,7 @@ export const APP_MAX_WIDTH = 430 // px — matches iPhone 13/14 width
 
 // ─── Competition ────────────────────────────────────────────────────────────
 export const COMPETITION_ID = 'UCL'
-export const COMPETITION_LABEL = 'UCL 2024/25'
+export const COMPETITION_LABEL = 'UCL 2025/26'
 export const COMPETITION_STATUS_LABEL = 'En curso'
 
 // ─── Scoring ────────────────────────────────────────────────────────────────

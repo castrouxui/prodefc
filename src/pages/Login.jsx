@@ -42,7 +42,7 @@ export default function Login() {
           Prode<span style={{ color: 'var(--accent)' }}>FC</span>
         </div>
         <p style={{ fontSize: 15, color: 'var(--text-secondary)' }}>
-          Champions League 2024/25
+          Champions League 2025/26
         </p>
       </div>
 
