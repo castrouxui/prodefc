@@ -8,12 +8,14 @@ import { formatMatchDate, matchStatusLabel } from '@/lib/dates'
 export default function MatchCard({ match, prediction }) {
   const navigate = useNavigate()
   const isFinished  = match.status === 'finished'
+  const isLive      = match.status === 'live'
   const isScheduled = match.status === 'scheduled'
   const hasPrediction = prediction != null
-  const canNavigate   = isScheduled
+  const canNavigate   = true
 
   function handleClick() {
-    if (canNavigate) navigate(`/predict/${match.id}`)
+    if (isScheduled) navigate(`/predict/${match.id}`)
+    else navigate(`/match/${match.id}`)
   }
 
   const statusBorderColor = isFinished ? 'var(--success-text)' : hasPrediction ? 'var(--accent)' : 'var(--border-strong)'

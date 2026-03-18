@@ -12,6 +12,7 @@ import Login         from './pages/Login'
 import JoinGroup     from './pages/JoinGroup'
 import Payment       from './pages/Payment'
 import MyPredictions from './pages/MyPredictions'
+import MatchResults  from './pages/MatchResults'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuthStore()
@@ -39,6 +40,7 @@ export default function AppRouter() {
         <Route path="join/:inviteCode" element={<JoinGroup />} />
         <Route path="payment/:groupId" element={<Payment />} />
         <Route path="my-predictions"  element={<MyPredictions />} />
+        <Route path="match/:matchId"  element={<MatchResults />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -43,6 +43,25 @@ export function usePrediction(matchId) {
   })
 }
 
+export function useMatchPredictions(matchId) {
+  const activeGroupId = useGroupStore(s => s.activeGroupId)
+
+  return useQuery({
+    queryKey: ['match-predictions', matchId, activeGroupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('predictions')
+        .select('*, profiles(username, avatar_url)')
+        .eq('match_id', matchId)
+        .eq('group_id', activeGroupId)
+        .order('points', { ascending: false })
+      if (error) throw error
+      return data
+    },
+    enabled: !!matchId && !!activeGroupId,
+  })
+}
+
 export function useUpsertPrediction() {
   const queryClient   = useQueryClient()
   const user          = useAuthStore(s => s.user)
