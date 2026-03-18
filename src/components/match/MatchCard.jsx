@@ -9,10 +9,11 @@ export default function MatchCard({ match, prediction }) {
   const navigate = useNavigate()
   const isFinished  = match.status === 'finished'
   const isScheduled = match.status === 'scheduled'
-  const hasPrediction     = prediction != null
+  const hasPrediction = prediction != null
+  const canNavigate   = isScheduled
 
   function handleClick() {
-    if (isScheduled && !hasPrediction) navigate(`/predict/${match.id}`)
+    if (canNavigate) navigate(`/predict/${match.id}`)
   }
 
   const statusBorderColor = isFinished ? 'var(--success-text)' : hasPrediction ? 'var(--accent)' : 'var(--border-strong)'
@@ -27,7 +28,7 @@ export default function MatchCard({ match, prediction }) {
         borderRadius: 'var(--radius-md)',
         padding: '10px 12px',
         borderLeft: `3px solid ${statusBorderColor}`,
-        cursor: isScheduled && !hasPrediction ? 'pointer' : 'default',
+        cursor: canNavigate ? 'pointer' : 'default',
       }}
     >
       {/* Header */}
@@ -76,12 +77,15 @@ export default function MatchCard({ match, prediction }) {
             </Badge>
           )}
           {isScheduled && !hasPrediction && (
-            <Badge variant="pending">Cargar</Badge>
+            <Badge variant="pending">Predecir</Badge>
           )}
           {isScheduled && hasPrediction && (
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
-              {prediction.home_pred} – {prediction.away_pred}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
+                {prediction.home_pred} – {prediction.away_pred}
+              </span>
+              <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>Editar</span>
+            </div>
           )}
         </div>
       </div>
@@ -90,12 +94,20 @@ export default function MatchCard({ match, prediction }) {
 }
 
 function TeamRow({ logo, name, bold }) {
+  const initial = name ? name.charAt(0).toUpperCase() : '?'
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
       {logo
-        ? <img src={logo} alt={name} width={20} height={20} style={{ borderRadius: '50%' }} />
-        : <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--bg-inset)' }} />
+        ? <img src={logo} alt={name} width={20} height={20} style={{ borderRadius: '50%' }} onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }} />
+        : null
       }
+      <div style={{
+        width: 20, height: 20, borderRadius: '50%', background: 'var(--bg-inset)',
+        display: logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 9, fontWeight: 700, color: 'var(--text-tertiary)',
+      }}>
+        {initial}
+      </div>
       <span style={{
         fontSize: 13, fontWeight: bold ? 700 : 500,
         color: bold ? 'var(--text-primary)' : 'var(--text-secondary)',

@@ -8,6 +8,7 @@ import { useActiveCompetition, useComingSoonCompetitions } from '@/hooks/useComp
 import MatchCard from '@/components/match/MatchCard'
 import RankingTable from '@/components/ranking/RankingTable'
 import {
+  COMPETITION_LABEL,
   COMPETITION_STATUS_LABEL,
   HOME_MATCHES_LIMIT,
   HOME_RANKING_LIMIT,
@@ -34,7 +35,7 @@ export default function Home() {
       {/* Competition indicator */}
       <div style={{ padding: '0 var(--page-px) 12px' }}>
         <CompetitionPill
-          label={`${activeComp.name} · ${COMPETITION_STATUS_LABEL}`}
+          label={`${COMPETITION_LABEL} · ${COMPETITION_STATUS_LABEL}`}
           logoUrl={activeComp.logo_url}
         />
       </div>

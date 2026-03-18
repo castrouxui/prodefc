@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useGroupStore } from '@/store/groupStore'
 import { useGroup } from '@/hooks/useGroup'
 import Avatar from '@/components/ui/Avatar'
 
 export default function TopBar() {
+  const navigate      = useNavigate()
   const user          = useAuthStore(s => s.user)
   const activeGroupId = useGroupStore(s => s.activeGroupId)
   const { data: group } = useGroup(activeGroupId)
@@ -26,11 +28,17 @@ export default function TopBar() {
             </span>
           </div>
         )}
-        <Avatar
-          src={user?.user_metadata?.avatar_url}
-          name={user?.user_metadata?.full_name ?? user?.email ?? '?'}
-          size={34}
-        />
+        <button
+          onClick={() => navigate('/profile')}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+          aria-label="Ir al perfil"
+        >
+          <Avatar
+            src={user?.user_metadata?.avatar_url}
+            name={user?.user_metadata?.full_name ?? user?.email ?? '?'}
+            size={34}
+          />
+        </button>
       </div>
     </header>
   )

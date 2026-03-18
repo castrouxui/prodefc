@@ -1,10 +1,13 @@
 import { useAuthStore } from '@/store/authStore'
 import Avatar from '@/components/ui/Avatar'
 
+const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' }
+
 export default function RankRow({ entry }) {
   const user  = useAuthStore(s => s.user)
   const isMe  = entry.user_id === user?.id
-  const isTop = entry.position <= 2
+  const isTop = entry.position <= 3
+  const medal = MEDALS[entry.position]
 
   return (
     <div style={{
@@ -14,10 +17,10 @@ export default function RankRow({ entry }) {
       borderBottom: '0.5px solid var(--border)',
     }}>
       <span style={{
-        fontSize: 13, fontWeight: 700, width: 18, textAlign: 'center',
-        color: isTop ? 'var(--accent)' : 'var(--text-tertiary)',
+        fontSize: medal ? 16 : 13, fontWeight: 700, width: 18, textAlign: 'center',
+        color: isTop && !medal ? 'var(--accent)' : 'var(--text-tertiary)',
       }}>
-        {entry.position}
+        {medal ?? entry.position}
       </span>
 
       <Avatar src={entry.avatar_url} name={entry.username} size={30} />
