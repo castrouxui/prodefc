@@ -36,16 +36,17 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    const apiKey = Deno.env.get('API_FOOTBALL_KEY')
+    const body = await req.json().catch(() => ({}))
+    const leagueId: number = body.leagueId ?? 2
+    const season: number   = body.season   ?? 2025   // 2025 = temporada 2025/26
+
+    // apiKey puede venir en el body (desde el cron via Vault) o como env secret
+    const apiKey = body.apiKey ?? Deno.env.get('API_FOOTBALL_KEY')
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'API_FOOTBALL_KEY no configurada' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    const body = await req.json().catch(() => ({}))
-    const leagueId: number = body.leagueId ?? 2
-    const season: number   = body.season   ?? 2025   // 2025 = temporada 2025/26
 
     const competition = COMPETITION_KEY[leagueId]
     if (!competition) {
