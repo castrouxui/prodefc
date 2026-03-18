@@ -1,13 +1,17 @@
-import { useParams, Navigate } from 'react-router-dom'
+import { useParams, Navigate, useNavigate } from 'react-router-dom'
 import { useMatch } from '@/hooks/useMatches'
 import { usePrediction } from '@/hooks/usePredictions'
+import { useGroupStore } from '@/store/groupStore'
 import { isMatchLocked, formatMatchDate } from '@/lib/dates'
 import PredictForm from '@/components/match/PredictForm'
 import MatchInsights from '@/components/match/MatchInsights'
 import Badge from '@/components/ui/Badge'
 
 export default function Predict() {
-  const { matchId } = useParams()
+  const { matchId }   = useParams()
+  const navigate      = useNavigate()
+  const activeGroupId = useGroupStore(s => s.activeGroupId)
+
   const { data: match,      isLoading: mLoading } = useMatch(matchId)
   const { data: prediction, isLoading: pLoading } = usePrediction(matchId)
 
@@ -18,8 +22,28 @@ export default function Predict() {
   if (!match) return <Navigate to="/" replace />
 
   const locked = isMatchLocked(match.match_date) || match.status !== 'scheduled'
-
   if (locked) return <Navigate to="/" replace />
+
+  // Sin grupo activo no se puede predecir
+  if (!activeGroupId) {
+    return (
+      <div style={{ padding: '2rem var(--page-px)', textAlign: 'center' }}>
+        <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 16 }}>
+          Necesitás estar en un grupo para pronosticar.
+        </p>
+        <button
+          onClick={() => navigate('/join/nuevo')}
+          style={{
+            padding: '12px 24px', background: 'var(--accent)', color: '#000',
+            border: 'none', borderRadius: 'var(--radius-md)',
+            fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          }}
+        >
+          Unirme a un grupo
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div style={{ paddingTop: 12 }}>

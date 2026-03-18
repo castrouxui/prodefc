@@ -50,6 +50,9 @@ export function useUpsertPrediction() {
 
   return useMutation({
     mutationFn: async ({ matchId, homePred, awayPred }) => {
+      if (!user?.id)      throw new Error('No estás autenticado.')
+      if (!activeGroupId) throw new Error('No tenés un grupo activo.')
+
       const { data, error } = await supabase
         .from('predictions')
         .upsert({

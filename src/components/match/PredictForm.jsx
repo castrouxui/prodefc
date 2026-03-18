@@ -8,11 +8,17 @@ export default function PredictForm({ match, existingPrediction }) {
 
   const [homeGoals, setHomeGoals] = useState(existingPrediction?.home_pred ?? 0)
   const [awayGoals, setAwayGoals] = useState(existingPrediction?.away_pred ?? 0)
+  const [error,     setError]     = useState(null)
 
   async function handleSubmit(e) {
     e.preventDefault()
-    await mutateAsync({ matchId: match.id, homePred: homeGoals, awayPred: awayGoals })
-    navigate('/')
+    setError(null)
+    try {
+      await mutateAsync({ matchId: match.id, homePred: homeGoals, awayPred: awayGoals })
+      navigate('/')
+    } catch (err) {
+      setError(err?.message ?? 'No se pudo guardar el pronóstico. Intentá de nuevo.')
+    }
   }
 
   return (
@@ -33,6 +39,15 @@ export default function PredictForm({ match, existingPrediction }) {
           onChange={setAwayGoals}
         />
       </div>
+
+      {error && (
+        <p style={{
+          fontSize: 13, color: 'var(--error-text)', background: 'var(--error-bg)',
+          padding: '10px 12px', borderRadius: 8, marginBottom: 12,
+        }}>
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"
