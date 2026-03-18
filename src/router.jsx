@@ -2,14 +2,15 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import AppShell from './components/layout/AppShell'
 
-import Home      from './pages/Home'
-import Fixture   from './pages/Fixture'
-import Ranking   from './pages/Ranking'
-import Predict   from './pages/Predict'
-import Profile   from './pages/Profile'
-import Login     from './pages/Login'
-import JoinGroup from './pages/JoinGroup'
-import Payment   from './pages/Payment'
+import Home          from './pages/Home'
+import Fixture       from './pages/Fixture'
+import Ranking       from './pages/Ranking'
+import Predict       from './pages/Predict'
+import Profile       from './pages/Profile'
+import Login         from './pages/Login'
+import JoinGroup     from './pages/JoinGroup'
+import Payment       from './pages/Payment'
+import MyPredictions from './pages/MyPredictions'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuthStore()
@@ -35,6 +36,7 @@ export default function AppRouter() {
         <Route path="profile" element={<Profile />} />
         <Route path="join/:inviteCode" element={<JoinGroup />} />
         <Route path="payment/:groupId" element={<Payment />} />
+        <Route path="my-predictions"  element={<MyPredictions />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useMyGroups } from '@/hooks/useGroup'
@@ -17,6 +18,14 @@ export default function Profile() {
 
   const { theme, toggle: toggleTheme } = useTheme()
   const name = user?.user_metadata?.full_name ?? user?.email ?? 'Usuario'
+
+  const [copiedId, setCopiedId] = useState(null)
+  function copyCode(code, groupId) {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedId(groupId)
+      setTimeout(() => setCopiedId(null), 2000)
+    })
+  }
 
   async function handleSignOut() {
     await signOut()
@@ -41,27 +50,62 @@ export default function Profile() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {myGroups.map(({ groups: group, payment_status }) => (
-            <button
+            <div
               key={group.id}
-              onClick={() => { setActive(group.id); navigate('/') }}
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '12px 14px',
                 background: activeGroupId === group.id ? 'var(--accent-dim)' : 'var(--bg-card)',
                 border: `0.5px solid ${activeGroupId === group.id ? 'var(--accent)' : 'var(--border)'}`,
-                borderRadius: 'var(--radius-md)', cursor: 'pointer', textAlign: 'left',
+                borderRadius: 'var(--radius-md)', overflow: 'hidden',
               }}
             >
-              <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{group.name}</p>
-                <p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-                  Código: {group.invite_code} · ${Number(group.entry_amount).toLocaleString('es-AR')} ARS
-                </p>
+              {/* Top row — tap to activate */}
+              <button
+                onClick={() => { setActive(group.id); navigate('/') }}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '12px 14px', width: '100%',
+                  background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left',
+                }}
+              >
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{group.name}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+                    ${Number(group.entry_amount).toLocaleString('es-AR')} ARS
+                  </p>
+                </div>
+                <Badge variant={payment_status === 'approved' ? 'success' : 'pending'}>
+                  {payment_status === 'approved' ? 'Activo' : 'Pendiente'}
+                </Badge>
+              </button>
+
+              {/* Bottom row — invite code + copy */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 14px 10px',
+                borderTop: '0.5px solid var(--border)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Código:</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: 'var(--text-primary)' }}>
+                    {group.invite_code}
+                  </span>
+                </div>
+                <button
+                  onClick={() => copyCode(group.invite_code, group.id)}
+                  style={{
+                    padding: '4px 10px',
+                    background: copiedId === group.id ? 'var(--success-bg)' : 'var(--bg-inset)',
+                    border: 'none',
+                    borderRadius: 9999,
+                    fontSize: 11, fontWeight: 600,
+                    color: copiedId === group.id ? 'var(--success-text)' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {copiedId === group.id ? '¡Copiado!' : 'Copiar'}
+                </button>
               </div>
-              <Badge variant={payment_status === 'approved' ? 'success' : 'pending'}>
-                {payment_status === 'approved' ? 'Activo' : 'Pendiente'}
-              </Badge>
-            </button>
+            </div>
           ))}
 
           <button
@@ -113,6 +157,24 @@ export default function Profile() {
             }} />
           </button>
         </div>
+      </div>
+
+      {/* My predictions */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <button
+          onClick={() => navigate('/my-predictions')}
+          style={{
+            width: '100%', padding: '12px 14px',
+            background: 'var(--bg-card)', border: '0.5px solid var(--border)',
+            borderRadius: 'var(--radius-md)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}
+        >
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+            Mis pronósticos
+          </span>
+          <span style={{ fontSize: 18, color: 'var(--text-tertiary)' }}>›</span>
+        </button>
       </div>
 
       {/* Sign out */}
