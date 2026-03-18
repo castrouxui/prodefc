@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 
+const STATUS_ORDER = { live: 0, scheduled: 1, finished: 2 }
+
 export function useMatches({ status, limit } = {}) {
   return useQuery({
     queryKey: ['matches', status, limit],
@@ -8,14 +10,22 @@ export function useMatches({ status, limit } = {}) {
       let query = supabase
         .from('matches')
         .select('*')
-        .order('match_date', { ascending: true })
 
       if (status) query = query.eq('status', status)
-      if (limit)  query = query.limit(limit)
 
       const { data, error } = await query
       if (error) throw error
-      return data
+
+      // Próximos y en vivo primero (fecha ASC), terminados al final (fecha DESC)
+      const sorted = (data ?? []).sort((a, b) => {
+        const sa = STATUS_ORDER[a.status] ?? 1
+        const sb = STATUS_ORDER[b.status] ?? 1
+        if (sa !== sb) return sa - sb
+        const diff = new Date(a.match_date) - new Date(b.match_date)
+        return a.status === 'finished' ? -diff : diff
+      })
+
+      return limit ? sorted.slice(0, limit) : sorted
     },
   })
 }
