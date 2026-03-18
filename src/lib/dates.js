@@ -4,12 +4,15 @@ import { LOCALE } from '@/config'
  * Formatea una fecha ISO a string legible en español.
  * Ej: "Mié 9 abr · 21:00"
  */
+const TZ = 'America/Argentina/Buenos_Aires'
+
 export function formatMatchDate(isoString) {
   const date = new Date(isoString)
-  const day  = date.toLocaleDateString(LOCALE, { weekday: 'short' })
-  const num  = date.getDate()
-  const mon  = date.toLocaleDateString(LOCALE, { month: 'short' })
-  const time = date.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' })
+  const opts = { timeZone: TZ }
+  const day  = date.toLocaleDateString(LOCALE, { ...opts, weekday: 'short' })
+  const num  = date.toLocaleDateString(LOCALE, { ...opts, day: 'numeric' })
+  const mon  = date.toLocaleDateString(LOCALE, { ...opts, month: 'short' })
+  const time = date.toLocaleTimeString(LOCALE, { ...opts, hour: '2-digit', minute: '2-digit' })
   return `${capitalize(day)} ${num} ${mon} · ${time}`
 }
 
