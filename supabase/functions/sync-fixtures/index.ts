@@ -3,7 +3,7 @@
 // Incluye logos de equipos y metadatos de ronda.
 //
 // Invocar via POST con body JSON:
-//   { "leagueId": 2, "season": 2024 }  → UCL 2024/25
+//   { "leagueId": 2, "season": 2025 }  → UCL 2025/26  ← default
 //   { "leagueId": 1, "season": 2026 }  → World Cup 2026
 //
 // Secrets requeridos (supabase secrets set ...):
@@ -45,7 +45,7 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}))
     const leagueId: number = body.leagueId ?? 2
-    const season: number   = body.season   ?? 2024
+    const season: number   = body.season   ?? 2025   // 2025 = temporada 2025/26
 
     const competition = COMPETITION_KEY[leagueId]
     if (!competition) {
