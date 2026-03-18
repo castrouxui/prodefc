@@ -3,6 +3,19 @@ import Avatar from '@/components/ui/Avatar'
 
 const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' }
 
+function PositionArrow({ current, prev }) {
+  const diff = prev - current // positivo = subió, negativo = bajó
+  if (diff > 0) return (
+    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--success-text)', lineHeight: 1 }}>▲</span>
+  )
+  if (diff < 0) return (
+    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--error-text)', lineHeight: 1 }}>▼</span>
+  )
+  return (
+    <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-tertiary)', lineHeight: 1 }}>—</span>
+  )
+}
+
 export default function RankRow({ entry }) {
   const user  = useAuthStore(s => s.user)
   const isMe  = entry.user_id === user?.id
@@ -33,7 +46,9 @@ export default function RankRow({ entry }) {
         {isMe ? `Vos · ${entry.username}` : entry.username}
       </span>
 
-      <span>
+      <PositionArrow current={entry.position} prev={entry.prev_position} />
+
+      <span style={{ marginLeft: 6 }}>
         <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
           {entry.total}
         </span>
