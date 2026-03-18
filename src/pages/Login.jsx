@@ -1,14 +1,34 @@
 import { useAuth } from '@/hooks/useAuth'
+import { useGroupStore } from '@/store/groupStore'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+const DEMO_GROUP_ID = 'aaaaaaaa-0000-0000-0000-000000000001'
 
 export default function Login() {
-  const { signInWithGoogle } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const { signInWithGoogle, signInWithEmail } = useAuth()
+  const setActiveGroup = useGroupStore(s => s.setActiveGroup)
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(null) // 'google' | 'demo' | null
+  const [error, setError] = useState(null)
 
   async function handleGoogle() {
-    setLoading(true)
+    setLoading('google'); setError(null)
     try { await signInWithGoogle() }
-    catch (e) { console.error(e); setLoading(false) }
+    catch (e) { console.error(e); setError('Error al conectar con Google.'); setLoading(null) }
+  }
+
+  async function handleDemo() {
+    setLoading('demo'); setError(null)
+    try {
+      await signInWithEmail('demo@prodefc.app', 'Demo2025!')
+      setActiveGroup(DEMO_GROUP_ID)
+      navigate('/')
+    } catch (e) {
+      console.error(e)
+      setError('No se pudo iniciar la sesión demo.')
+      setLoading(null)
+    }
   }
 
   return (
@@ -34,19 +54,45 @@ export default function Login() {
       }}>
         <button
           onClick={handleGoogle}
-          disabled={loading}
+          disabled={loading !== null}
           style={{
             width: '100%', padding: '12px 0',
             background: 'var(--bg-inset)', border: '0.5px solid var(--border)',
             borderRadius: 'var(--radius-md)', fontSize: 14, fontWeight: 600,
             color: 'var(--text-primary)', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            opacity: loading ? 0.6 : 1,
+            opacity: loading !== null ? 0.5 : 1,
           }}
         >
           <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
-          {loading ? 'Redirigiendo...' : 'Continuar con Google'}
+          {loading === 'google' ? 'Redirigiendo...' : 'Continuar con Google'}
         </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ flex: 1, height: '0.5px', background: 'var(--border)' }} />
+          <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 500 }}>o</span>
+          <div style={{ flex: 1, height: '0.5px', background: 'var(--border)' }} />
+        </div>
+
+        <button
+          onClick={handleDemo}
+          disabled={loading !== null}
+          style={{
+            width: '100%', padding: '12px 0',
+            background: 'var(--accent-dim)', border: '0.5px solid var(--accent)',
+            borderRadius: 'var(--radius-md)', fontSize: 14, fontWeight: 600,
+            color: 'var(--accent)', cursor: 'pointer',
+            opacity: loading !== null ? 0.5 : 1,
+          }}
+        >
+          {loading === 'demo' ? 'Entrando...' : 'Entrar como invitado'}
+        </button>
+
+        {error && (
+          <p style={{ fontSize: 12, color: 'var(--error-text)', textAlign: 'center', margin: 0 }}>
+            {error}
+          </p>
+        )}
       </div>
     </div>
   )

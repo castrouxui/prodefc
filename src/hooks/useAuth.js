@@ -11,10 +11,15 @@ export function useAuth() {
     if (error) throw error
   }
 
+  async function signInWithEmail(email, password) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+  }
+
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
 
-  return { signInWithGoogle, signOut }
+  return { signInWithGoogle, signInWithEmail, signOut }
 }
