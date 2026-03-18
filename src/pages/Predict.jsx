@@ -3,6 +3,7 @@ import { useMatch } from '@/hooks/useMatches'
 import { usePrediction } from '@/hooks/usePredictions'
 import { isMatchLocked, formatMatchDate } from '@/lib/dates'
 import PredictForm from '@/components/match/PredictForm'
+import MatchInsights from '@/components/match/MatchInsights'
 import Badge from '@/components/ui/Badge'
 
 export default function Predict() {
@@ -33,6 +34,7 @@ export default function Predict() {
       </div>
 
       <PredictForm match={match} existingPrediction={prediction} />
+      <MatchInsights match={match} />
     </div>
   )
 }
