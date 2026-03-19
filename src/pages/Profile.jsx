@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
-import { useMyGroups } from '@/hooks/useGroup'
+import { useMyGroups, useDeleteGroup } from '@/hooks/useGroup'
 import { useGroupStore } from '@/store/groupStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -15,11 +15,13 @@ export default function Profile() {
   const setActive     = useGroupStore(s => s.setActiveGroup)
   const { signOut }   = useAuth()
   const { data: myGroups = [] } = useMyGroups()
+  const { mutateAsync: deleteGroup } = useDeleteGroup()
 
   const { theme, toggle: toggleTheme } = useTheme()
   const name = user?.user_metadata?.full_name ?? user?.email ?? 'Usuario'
 
-  const [copiedId, setCopiedId] = useState(null)
+  const [copiedId,    setCopiedId]    = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null) // groupId a confirmar
   function copyCode(code, groupId) {
     navigator.clipboard.writeText(code).then(() => {
       setCopiedId(groupId)
@@ -78,7 +80,7 @@ export default function Profile() {
                 </Badge>
               </button>
 
-              {/* Bottom row — invite code + copy */}
+              {/* Bottom row — invite code + copy + delete (solo admin) */}
               <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '8px 14px 10px',
@@ -90,20 +92,52 @@ export default function Profile() {
                     {group.invite_code}
                   </span>
                 </div>
-                <button
-                  onClick={() => copyCode(group.invite_code, group.id)}
-                  style={{
-                    padding: '4px 10px',
-                    background: copiedId === group.id ? 'var(--success-bg)' : 'var(--bg-inset)',
-                    border: 'none',
-                    borderRadius: 9999,
-                    fontSize: 11, fontWeight: 600,
-                    color: copiedId === group.id ? 'var(--success-text)' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {copiedId === group.id ? '¡Copiado!' : 'Copiar'}
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button
+                    onClick={() => copyCode(group.invite_code, group.id)}
+                    style={{
+                      padding: '4px 10px',
+                      background: copiedId === group.id ? 'var(--success-bg)' : 'var(--bg-inset)',
+                      border: 'none', borderRadius: 9999,
+                      fontSize: 11, fontWeight: 600,
+                      color: copiedId === group.id ? 'var(--success-text)' : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {copiedId === group.id ? '¡Copiado!' : 'Copiar'}
+                  </button>
+
+                  {/* Eliminar — solo para el creador del grupo */}
+                  {group.created_by === user?.id && (
+                    confirmDelete === group.id ? (
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button
+                          onClick={async () => {
+                            await deleteGroup(group.id)
+                            setConfirmDelete(null)
+                          }}
+                          style={{ padding: '4px 8px', background: 'var(--error-bg)', border: 'none', borderRadius: 9999, fontSize: 11, fontWeight: 700, color: 'var(--error-text)', cursor: 'pointer' }}
+                        >
+                          Eliminar
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(null)}
+                          style={{ padding: '4px 8px', background: 'var(--bg-inset)', border: 'none', borderRadius: 9999, fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}
+                        >
+                          No
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDelete(group.id)}
+                        style={{ padding: '4px 8px', background: 'transparent', border: 'none', fontSize: 15, cursor: 'pointer', color: 'var(--text-tertiary)' }}
+                        aria-label="Eliminar grupo"
+                      >
+                        🗑
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           ))}

@@ -63,6 +63,28 @@ export function useCreateGroup() {
   })
 }
 
+export function useDeleteGroup() {
+  const queryClient = useQueryClient()
+  const user        = useAuthStore(s => s.user)
+  const activeGroupId = useGroupStore(s => s.activeGroupId)
+  const setActive   = useGroupStore(s => s.setActiveGroup)
+
+  return useMutation({
+    mutationFn: async (groupId) => {
+      const { error } = await supabase
+        .from('groups')
+        .delete()
+        .eq('id', groupId)
+      if (error) throw error
+      return groupId
+    },
+    onSuccess: (groupId) => {
+      if (activeGroupId === groupId) setActive(null)
+      queryClient.invalidateQueries({ queryKey: ['my-groups', user?.id] })
+    },
+  })
+}
+
 export function useJoinGroup() {
   const user = useAuthStore(s => s.user)
 

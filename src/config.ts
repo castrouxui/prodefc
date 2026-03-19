@@ -5,8 +5,8 @@ export const APP_NAME = 'ProdeFC'
 // Los logos se sirven desde el CDN público de API-Football — sin API key.
 export const API_FOOTBALL_CDN = 'https://media.api-sports.io/football'
 export const UCL_LOGO_URL    = `${API_FOOTBALL_CDN}/leagues/2.png`   // Champions League
-// Logo oficial FIFA World Cup 2026 — Wikimedia Commons (PNG generado desde SVG oficial)
-export const WC2026_LOGO_URL = 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/2026_FIFA_World_Cup_logo.svg/240px-2026_FIFA_World_Cup_logo.svg.png'
+// Logo oficial FIFA World Cup 2026 — servido desde /public (sin dependencia externa)
+export const WC2026_LOGO_URL = '/wc2026-logo.png'
 export const APP_MAX_WIDTH = 430 // px — matches iPhone 13/14 width
 
 // ─── Competition ────────────────────────────────────────────────────────────
