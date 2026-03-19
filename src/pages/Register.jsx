@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/store/authStore'
+import { WC2026_LOGO_URL } from '@/config'
 
 export default function Register() {
   const navigate  = useNavigate()
@@ -171,9 +172,12 @@ function Logo() {
       <div style={{ fontSize: 42, fontWeight: 800, letterSpacing: -1, color: 'var(--text-primary)' }}>
         Prode<span style={{ color: 'var(--accent)' }}>FC</span>
       </div>
-      <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
-        Champions League 2025/26
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8 }}>
+        <img src={WC2026_LOGO_URL} alt="FIFA World Cup 2026" height={32} style={{ objectFit: 'contain' }} />
+        <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>
+          FIFA World Cup 2026
+        </span>
+      </div>
     </div>
   )
 }
